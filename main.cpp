@@ -114,14 +114,7 @@ void gameUpdate(sf::RenderWindow& window, sf::RectangleShape displayBoard[], Cel
         }
 
         // draw an X
-        sf::Font font;
-        if (!font.loadFromFile("Arial.ttf")) {
-            // handle error and close
-            window.close();
-        }
-        else {
-            std::cout << "Success" << std::endl;
-        }
+        
 
         window.display();
     }
@@ -151,6 +144,11 @@ int main()
         }
     }
 
+    // load fonts
+    sf::Font font;
+    font.loadFromFile("../EnvyCodeRNerdFont-Regular.ttf");
+
+    // enter game loop
     gameUpdate(window, displayBoard, gameBoard);
 
     return 0;

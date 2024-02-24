@@ -20,7 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="..\..\..\..\..\..\Downloads\EnvyCodeR\EnvyCodeRNerdFont-Regular.ttf" />
-    <Font Include="..\..\..\..\..\..\Downloads\Arial.ttf" />
+    <Font Include="EnvyCodeRNerdFontMono-Regular.ttf" />
   </ItemGroup>
 </Project>
