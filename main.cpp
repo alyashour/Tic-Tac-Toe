@@ -146,7 +146,7 @@ int main()
 
     // load fonts
     sf::Font font;
-    font.loadFromFile("../EnvyCodeRNerdFont-Regular.ttf");
+    font.loadFromFile("EnvyCodeRNerdFontMono-Regular.ttf");
 
     // enter game loop
     gameUpdate(window, displayBoard, gameBoard);
