@@ -1,6 +1,12 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+std::string fontFile = "EnvyCodeRNerdFontMono-Regular.ttf";
+float windowWidth = 800.f;
+float windowMargin = 50.f;
+sf::FloatRect playArea{ windowMargin, windowMargin, windowWidth - 2 * windowMargin, windowWidth - 2 * windowMargin };
+float lineThickness = 20.f;
+
 enum State {
     X,
     O,
@@ -12,62 +18,61 @@ struct Cell {
     sf::FloatRect bounds;
 };
 
+void updateState(int numOfTurnsPassed, State& state) {
+    // calculate who's turn it is
+    // x always goes first so if the total number of turns passed is even, its Xs turn, otherwise O
+    // and if the number of turns passed is 9 the game is over!
+    if (numOfTurnsPassed >= 9) std::cout << "The game is over!" << std::endl;
+    else if (numOfTurnsPassed % 2 == 0) state = State::X;
+    else state = State::O;
+}
+
 /// <summary>
 /// This is an event handler for left mouse clicks
 /// </summary>
 /// <param name="event">The event object. It contains the click type and click position</param>
 /// <param name="gameBoard">The board that contains the current game state</param>
-void handleLeftMouseClick(sf::Event::MouseButtonEvent event, Cell gameBoard[3][3]) {
-    // find board indices & count how many x's and o's there are in the board currently
-    int gridX = -1, gridY = -1;
-    int numOfEmptys = 0;
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++) {
-            // find mouse index
-            if (gameBoard[i][j].bounds.contains(event.x, event.y)) gridX = i, gridY = j;
-
-            // count number of emptys
-            if (gameBoard[i][j].state == State::Empty) numOfEmptys++;
-        }
-    int numOfTurnsPassed = 9 - numOfEmptys;
-
+void handleLeftMouseClick(sf::Event::MouseButtonEvent event, Cell gameBoard[][3]) {
+    sf::Vector2f mousePosition{ static_cast<float>(event.x), static_cast<float>(event.y) };
     // break out if click is outside the playing area
-    if (gridX == -1 || gridY == -1) {
+    if (!playArea.contains(mousePosition)) {
         std::cout << "Click was outside the game boundary" << std::endl;
         return;
     }
 
-    // as of this point we have the mouse location and number of turns played
-    std::cout << "Mouse clicked on (" << gridX << ", " << gridY << ")" << std::endl;
+    // find board indices & count how many x's and o's there are in the board currently
+    int gridX, gridY;
+    int numOfTurnsPassed = 0;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            Cell cell = gameBoard[i][j];
 
-    // calculate who's turn it is
-    // x always goes first so if the total number of turns passed is even, its Xs turn, otherwise O
-    // and if the number of turns passed is 9 the game is over!
-    if (numOfTurnsPassed >= 9) std::cout << "The game is over!" << std::endl;
-    else if (numOfTurnsPassed % 2 == 0) {
-        // it was Xs turn so place an X
-        gameBoard[gridX][gridY].state = State::X;
-        std::cout << "It is X's Turn" << std::endl;
+            // find mouse index
+            if (cell.bounds.contains(event.x, event.y)) gridX = i, gridY = j;
+
+            // count number of emptys
+            if (cell.state != State::Empty) numOfTurnsPassed++;
+        }
     }
-    else {
-        gameBoard[gridX][gridY].state = State::O;
-        std::cout << "It is O's Turn" << std::endl;
-    }
+
+    // update the state
+    updateState(numOfTurnsPassed, gameBoard[gridX][gridY].state);
+
+    // check for win
 }
 
 /// <summary>
 /// Creates the visual board (the background lines)
 /// </summary>
-/// <param name="margin">The boundaries around the edge of the window. This is symmetrical (top/bottom and left/right)</param>
+/// <param name="displayBoard">An array of size 4 that will contain the rectangles that make up the board</param>
 /// <param name="length">The length of the lines</param>
-/// <param name="width">The width of the lines</param>
-/// <returns>An array containing 4 rectangles that make up the game board</returns>
-void initializeBoard(sf::RectangleShape displayBoard[], float margin, float length, float width) {
+/// <param name="thickness">The width of the lines</param>
+void initializeBoard(sf::RectangleShape displayBoard[], float length, float thickness) {
     // make the board
-    displayBoard[0] = sf::RectangleShape{sf::Vector2f(length, width)};
-    displayBoard[1] = sf::RectangleShape{sf::Vector2f(length, width)};
-    displayBoard[2] = sf::RectangleShape{sf::Vector2f(width, length)};
-    displayBoard[3] = sf::RectangleShape{sf::Vector2f(width, length)};
+    displayBoard[0] = sf::RectangleShape{sf::Vector2f(length, thickness)};
+    displayBoard[1] = sf::RectangleShape{sf::Vector2f(length, thickness)};
+    displayBoard[2] = sf::RectangleShape{sf::Vector2f(thickness, length)};
+    displayBoard[3] = sf::RectangleShape{sf::Vector2f(thickness, length)};
 
     // set universal properties like colour 
     for (int i = 0; i < 4; i++) {
@@ -76,29 +81,46 @@ void initializeBoard(sf::RectangleShape displayBoard[], float margin, float leng
     }
 
     // position the board lines
-    displayBoard[0].setPosition(800 / 3.f, margin);
-    displayBoard[1].setPosition(2 * 800 / 3.f, margin);
-    displayBoard[2].setPosition(margin, 800 / 3.f);
-    displayBoard[3].setPosition(margin, 2 * 800 / 3.f);
+    // they are at 1/3 and 2/3 vertically and horizontally + the margins + the thickness of the line
+    // horizontal
+    displayBoard[0].setPosition(windowMargin, windowWidth / 3.f);       // 1/3
+    displayBoard[1].setPosition(windowMargin, 2 * windowWidth / 3.f);   // 2/3
+    // vertical
+    displayBoard[2].setPosition(windowWidth / 3.f - 0.5f * lineThickness, windowMargin);       // 1/3
+    displayBoard[3].setPosition(2 * windowWidth / 3.f - 0.5f * lineThickness, windowMargin);   // 2/3
+    
 }
 
+/// <summary>
+/// This contains the event loop. It runs until the window runs out of events.
+/// </summary>
+/// <param name="window">The current playing window</param>
+/// <param name="gameBoard">The 3 by 3 gameboard</param>
 void eventUpdate(sf::RenderWindow& window, Cell gameBoard[3][3]) {
     sf::Event event;
     while (window.pollEvent(event))
     {
         // attach event listeners here
         switch (event.type) {
-        case sf::Event::Closed:
-            window.close();
-            break;
-        case sf::Event::MouseButtonReleased:
-            if (event.mouseButton.button == sf::Mouse::Left) handleLeftMouseClick(event.mouseButton, gameBoard);
-            break;
+            case sf::Event::Closed:
+                window.close();
+                break;
+            case sf::Event::MouseButtonReleased:
+                if (event.mouseButton.button == sf::Mouse::Left) handleLeftMouseClick(event.mouseButton, gameBoard);
+                break;
         }
     }
 }
 
-void gameUpdate(sf::RenderWindow& window, sf::RectangleShape displayBoard[], Cell gameBoard[3][3]) {
+/// <summary>
+/// This is the main game loop.
+/// </summary>
+/// <param name="window">The main window</param>
+/// <param name="displayBoard">An array of size 4 containing the lines that make up the board</param>
+/// <param name="gameBoard">The 3 by 3 gameboard</param>
+/// <param name="x">A Text object of proper size containing the letter "X"</param>
+/// <param name="o">A Text object of proper size containing the letter "O"</param>
+void gameUpdate(sf::RenderWindow& window, sf::RectangleShape displayBoard[], Cell gameBoard[3][3], sf::Text x, sf::Text o) {
     // runs the program as long as the window is open
     // this is the main/game loop
     while (window.isOpen())
@@ -113,43 +135,79 @@ void gameUpdate(sf::RenderWindow& window, sf::RectangleShape displayBoard[], Cel
             window.draw(displayBoard[i]);
         }
 
-        // draw an X
-        
+        // draw the Xs and Os
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                Cell cell = gameBoard[i][j];
+                State state = cell.state;
+
+                switch (state) {
+                    case X:
+                        x.setPosition(cell.bounds.getPosition());
+                        window.draw(x);
+                        //std::cout << "Drawing X at (" << x.getPosition().x << ", " << x.getPosition().y << ")" << std::endl;
+                        break;
+                    case O:
+                        o.setPosition(cell.bounds.getPosition());
+                        window.draw(o);
+                        // std::cout << "Drawing O at (" << i << ", " << j << ")" << std::endl;
+                        break;
+                }
+            }
+        }
 
         window.display();
     }
 }
 
+
 int main()
 {
     // initialize window
-    float windowLen = 800;
-    sf::RenderWindow window(sf::VideoMode(windowLen, windowLen), "Tic Tac Toe!", sf::Style::Titlebar | sf::Style::Close);
-    float margin = 50;
-    float boardWidth = 700.f, boardLength = 20.f;
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowWidth), "Tic Tac Toe!", sf::Style::Titlebar | sf::Style::Close);
 
     // make the board
     sf::RectangleShape displayBoard[4];
-    initializeBoard(displayBoard, margin, boardLength, boardWidth);
+    initializeBoard(displayBoard, playArea.height, lineThickness);
 
     // make the gameboard
     Cell gameBoard[3][3];
 
     // populate with empty states
-    float boundSideLength = 700.f / 3;
+    float boundSideLength = playArea.height / 3.f;
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             gameBoard[i][j].state = State::Empty;
-            gameBoard[i][j].bounds = sf::FloatRect{ margin + i * boundSideLength, margin + j * boundSideLength, boundSideLength, boundSideLength };
+            gameBoard[i][j].bounds = sf::FloatRect{ windowMargin + i * boundSideLength, windowMargin + j * boundSideLength, boundSideLength, boundSideLength };
         }
     }
 
+    /** It may be better to use a glyph of X and O as a picture here to be able to size it directly using Cell bounds.
+     * But since font sizes are measured in pixels and I know the size of my window in pixels this works just great */
     // load fonts
+    
+    // make text
     sf::Font font;
-    font.loadFromFile("EnvyCodeRNerdFontMono-Regular.ttf");
+    font.loadFromFile(fontFile);
+
+    sf::Text x;
+    x.setFont(font);
+    x.setString("X");
+    x.setCharacterSize(playArea.height / 3.f);
+    x.setFillColor(sf::Color::White);
+    x.setStyle(sf::Text::Bold);
+    x.setPosition(0, 0);
+    sf::Text o;
+    o.setFont(font);
+    o.setString("O");
+    o.setCharacterSize(playArea.height / 3.f);
+    o.setFillColor(sf::Color::White);
+    o.setStyle(sf::Text::Bold);
+    o.setPosition(0, 0);
+    
 
     // enter game loop
-    gameUpdate(window, displayBoard, gameBoard);
+    gameUpdate(window, displayBoard, gameBoard, x, o);
 
     return 0;
 }

@@ -72,11 +72,11 @@ Write dates as either [Month (short form)] [Day (number)], [4-digit year] (prefe
 ## Outcomes
 Now for the icky sticky.
 
-The absolute most difficult part of this project (as I expected) was setting it up. Once I was in, it was no problem. The biggest headaches were importing files like fonts and images into Visual Studio (which I still don't really get) and 
+The absolute most difficult part of this project (as I expected) was setting it up. Once I was in, it was no problem. The biggest headache was importing files like fonts and images into Visual Studio (which I still don't really get).
 I refreshed a TON of my C++ knowledge and learned the basics of SFML.
 ## Sources
 This page was heaven-send https://www.sfml-dev.org/tutorials/2.6/. 
-Directly from my notes: "If every guide could be made like this the world would be a better place." It is concise, focuses on what's needed 
+Directly from my notes: "If every guide could be made like this the world would be a better place." It is concise, focuses on what's needed and answers my questions exactly when I have them. 10/10.
 
 
 Aly Ashour. Feb 24, 2023.
