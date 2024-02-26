@@ -56,7 +56,7 @@ I got FXML working properly by:
 ```bash
 g++ main.cpp -I/opt/homebrew/Cellar/sfml/2.6.1/include -o game -L/opt/homebrew/Cellar/sfml/2.6.1/lib -lsfml-graphics -lsfml-window -lsfml-system
 ```
-3. Running the app from the terminal (because for some reason if you run by double-clicking the working directory becomes the base directory????)
+3. Running the app from the terminal (because if you run by double-clicking the working directory becomes the home directory)
 ### Docs
 I love almost everything there is to do with being a software engineering student but the one thing I do miss from being just an **engineering** student and (if I dare go back even further) a physics student, is looking over a clean lab outline.
 Theres nothing quite like beautiful headers on a blank page, and writing this has only made that clearer for me. God, just look at the headers on this document!
