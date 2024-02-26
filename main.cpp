@@ -4,7 +4,7 @@
 std::string fontFile = "EnvyCodeRNerdFontMono-Regular.ttf";
 float windowWidth = 800.f;
 float windowMargin = 50.f;
-sf::FloatRect playArea{ windowMargin, windowMargin, windowWidth - 2 * windowMargin, windowWidth - 2 * windowMargin };
+sf::FloatRect playArea(windowMargin, windowMargin, windowWidth - 2 * windowMargin, windowWidth - 2 * windowMargin);
 float lineThickness = 20.f;
 
 enum State {
@@ -33,7 +33,7 @@ void updateState(int numOfTurnsPassed, State& state) {
 /// <param name="event">The event object. It contains the click type and click position</param>
 /// <param name="gameBoard">The board that contains the current game state</param>
 void handleLeftMouseClick(sf::Event::MouseButtonEvent event, Cell gameBoard[][3]) {
-    sf::Vector2f mousePosition{ static_cast<float>(event.x), static_cast<float>(event.y) };
+    sf::Vector2f mousePosition(static_cast<float>(event.x), static_cast<float>(event.y));
     // break out if click is outside the playing area
     if (!playArea.contains(mousePosition)) {
         std::cout << "Click was outside the game boundary" << std::endl;
@@ -69,12 +69,12 @@ void handleLeftMouseClick(sf::Event::MouseButtonEvent event, Cell gameBoard[][3]
 /// <param name="thickness">The width of the lines</param>
 void initializeBoard(sf::RectangleShape displayBoard[], float length, float thickness) {
     // make the board
-    displayBoard[0] = sf::RectangleShape{sf::Vector2f(length, thickness)};
-    displayBoard[1] = sf::RectangleShape{sf::Vector2f(length, thickness)};
-    displayBoard[2] = sf::RectangleShape{sf::Vector2f(thickness, length)};
-    displayBoard[3] = sf::RectangleShape{sf::Vector2f(thickness, length)};
+    displayBoard[0] = sf::RectangleShape(sf::Vector2f(length, thickness));
+    displayBoard[1] = sf::RectangleShape(sf::Vector2f(length, thickness));
+    displayBoard[2] = sf::RectangleShape(sf::Vector2f(thickness, length));
+    displayBoard[3] = sf::RectangleShape(sf::Vector2f(thickness, length));
 
-    // set universal properties like colour 
+    // set universal properties like colour
     for (int i = 0; i < 4; i++) {
         sf::RectangleShape rect = displayBoard[i];
         rect.setFillColor(sf::Color::White);
@@ -145,12 +145,10 @@ void gameUpdate(sf::RenderWindow& window, sf::RectangleShape displayBoard[], Cel
                     case X:
                         x.setPosition(cell.bounds.getPosition());
                         window.draw(x);
-                        //std::cout << "Drawing X at (" << x.getPosition().x << ", " << x.getPosition().y << ")" << std::endl;
                         break;
                     case O:
                         o.setPosition(cell.bounds.getPosition());
                         window.draw(o);
-                        // std::cout << "Drawing O at (" << i << ", " << j << ")" << std::endl;
                         break;
                 }
             }
@@ -178,7 +176,7 @@ int main()
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             gameBoard[i][j].state = State::Empty;
-            gameBoard[i][j].bounds = sf::FloatRect{ windowMargin + i * boundSideLength, windowMargin + j * boundSideLength, boundSideLength, boundSideLength };
+            gameBoard[i][j].bounds = sf::FloatRect(windowMargin + i * boundSideLength, windowMargin + j * boundSideLength, boundSideLength, boundSideLength);
         }
     }
 
