@@ -8,10 +8,10 @@ This is *getting my feet wet*. The code should be simple, quick, and clean with 
 ### Prelim.
 I wanted to make a game with few difficulties and Tic Tac Toe proved as good as any for this. The choice of game really didn't matter here so long as it had some game elements and a UI.
 For choice of language I'm interested in a few right now namely:
-- Java (with which I am most comfortable through ES1036, SE2205, and SE2203), 
-- Rust (I have only heard good things but have never used before), 
-- JS (extremely popular and I've taken a course in SE2202), 
-- C# (which I had used before and am learning right now in SE2250) 
+- Java (with which I am most comfortable through ES1036, SE2205, and SE2203),
+- Rust (I have only heard good things but have never used before),
+- JS (extremely popular and I've taken a course in SE2202),
+- C# (which I had used before and am learning right now in SE2250)
 - or C++. This one seemed the most interesting to me. It was the first language I learned deeply (in highschool) but have since sort of forgotten. It is also extremely popular in Game Dev., graphics, embedded, which all sound super interesting to me.
 
 Regarding C++ tools I could use, it came down to SFML and SDL. At some point I wanted to work in NeoVim with OpenGl and no libraries whatsoever like jdh on youtube but frankly finding docs on how to install OpenGL correctly made me want to kms so that was off the table (for now ;)).
@@ -49,6 +49,14 @@ int main() {
 	return 0;
 }
 ```
+### MacOS Specifics
+I got FXML working properly by:
+1. Installing using brew.
+2. Compiling using
+```bash
+g++ main.cpp -I/opt/homebrew/Cellar/sfml/2.6.1/include -o game -L/opt/homebrew/Cellar/sfml/2.6.1/lib -lsfml-graphics -lsfml-window -lsfml-system
+```
+3. Running the app from the terminal (because for some reason if you run by double-clicking the working directory becomes the base directory????)
 ### Docs
 I love almost everything there is to do with being a software engineering student but the one thing I do miss from being just an **engineering** student and (if I dare go back even further) a physics student, is looking over a clean lab outline.
 Theres nothing quite like beautiful headers on a blank page, and writing this has only made that clearer for me. God, just look at the headers on this document!
@@ -57,7 +65,7 @@ Oh man I was just salivating thinking of what I was gonna write down... "Prelim.
 For future reference, project documentation should be elegant and flexible. If I had more time I would write a manifesto on why strict headers are the worst thing since the plague, but since I will probably only ever read this once I will keep it short.
 1. Keep abstract sections like "Objectives" and "Outcomes". Feel free to add more if needed to highlight parts of the project. The top-level heading in the main ReadMe.md should always be the name of the project, see 5. for other files.
 2. Subheadings should be specific to every project. Very rarely are two projects the same enough to warrant identical subheadings and even if they are, documentation (especially for me student and for these README's) should focus on what's differenet, new, unique not the same, old, and mundane.
-3. Docs are NOT a place to put specific notes on language or library features. This is a place for wider themes of the project. Think of project documentation as a method to describe the research and engineering NOT the learning and the programming, that should be saved for your ACTUAL notes. For example "make a variable with the word var" is NOT good but "identifying classes beforehand helped 
+3. Docs are NOT a place to put specific notes on language or library features. This is a place for wider themes of the project. Think of project documentation as a method to describe the research and engineering NOT the learning and the programming, that should be saved for your ACTUAL notes. For example "make a variable with the word var" is NOT good but "identifying classes beforehand helped
 4. Write notes that are descriptive of what *happened* not what there is to learn of it, ESPECIALLY under some header that conveys that like "# Issues" or a specific concept like "# Inheritance". For Example:
 	- "Writing semi-working code quickly and refactoring iteratively as I went helped to extract meaningful data structures and classes and avoid unnecessary *objectification* when it wasn't needed" is GOOD writing. Especially If you include the specific parts of the software that gave you those insights to help remember.
 	- But "Try to write quickly and spot classes as you go." is NOT good writing. Notice how much information was lost between the two sentences. Really, it is NOT always good to write quickly. Write what happened, not why you think it happened.
@@ -75,7 +83,7 @@ Now for the icky sticky.
 The absolute most difficult part of this project (as I expected) was setting it up. Once I was in, it was no problem. The biggest headache was importing files like fonts and images into Visual Studio (which I still don't really get).
 I refreshed a TON of my C++ knowledge and learned the basics of SFML.
 ## Sources
-This page was heaven-send https://www.sfml-dev.org/tutorials/2.6/. 
+This page was heaven-send https://www.sfml-dev.org/tutorials/2.6/.
 Directly from my notes: "If every guide could be made like this the world would be a better place." It is concise, focuses on what's needed and answers my questions exactly when I have them. 10/10.
 
 
