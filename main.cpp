@@ -20,17 +20,46 @@ const float windowMargin = 50.f;
 const sf::FloatRect playArea(windowMargin, windowMargin, windowWidth - 2 * windowMargin, windowWidth - 2 * windowMargin);
 const float lineThickness = 20.f;
 const float cellSideLength = (playArea.height - 2.f * lineThickness) / 3.f;
-State winningPlayer = State::Empty;
 
-State whosTurn(int numOfTurnsPassed, const State currentState) {
+// global variables
+State winningPlayer = State::Empty;
+bool gameIsTied = false;
+
+/// @brief Checks all the conditions for a win
+/// @param gameBoard the current game board (a 3x3 board of cells)
+/// @param currentTurn who just went (i.e, the person who just won)
+void checkForWin(Cell gameBoard[][3], State currentTurn){
+    // there are 8 ways to win
+    // 2 diagonals
+    if ((gameBoard[0][0].state == gameBoard[1][1].state && gameBoard[1][1].state == gameBoard[2][2].state) ||
+        (gameBoard[2][0].state == gameBoard[1][1].state && gameBoard[1][1].state == gameBoard[0][2].state)) {
+        if (gameBoard[1][1].state != State::Empty) winningPlayer = currentTurn; // empty states are also equivalent so they must be weeded out
+    }
+    // 3 horizontal and 3 vertical
+    for (int i = 0; i < 3; i++)
+        if ((gameBoard[i][0].state != State::Empty && gameBoard[i][0].state == gameBoard[i][1].state && gameBoard[i][1].state == gameBoard[i][2].state)
+            || (gameBoard[0][i].state != State::Empty && gameBoard[0][i].state == gameBoard[1][i].state && gameBoard[1][i].state == gameBoard[2][i].state)) {
+            winningPlayer = currentTurn;
+        }
+}
+
+/// @brief Calculates who's turn it currently is using the number of turns passed (assuming X goes first)
+/// Optionally, pass in the current state of the cell that was just clicked to keep it the same
+/// @param numOfTurnsPassed 
+/// @param currentState 
+/// @return 
+State whosTurn(int numOfTurnsPassed) {
     // calculate who's turn it is
     // x always goes first so if the total number of turns passed is even, its Xs turn, otherwise O
     // and if the number of turns passed is 9 the game is over!
-    if (numOfTurnsPassed >= 9) std::cout << "The game is over!" << std::endl;
-    else if (numOfTurnsPassed % 2 == 0) return State::X;
-    else return State::O;
-
-    return currentState;
+    if (numOfTurnsPassed % 2 == 0) {
+        std::cout << "It is X's turn" << std::endl;
+        return State::X;
+    }
+    else {
+        std::cout << "It is O's turn" << std::endl;
+        return State::O;
+    }
 }
 
 sf::Text createText(sf::Font &font, std::string s, sf::Vector2f origin = sf::Vector2f(0, 0)){
@@ -44,13 +73,16 @@ sf::Text createText(sf::Font &font, std::string s, sf::Vector2f origin = sf::Vec
     return text;
 }
 
+
 /// <summary>
 /// This is an event handler for left mouse clicks
 /// </summary>
 /// <param name="event">The event object. It contains the click type and click position</param>
 /// <param name="gameBoard">The board that contains the current game state</param>
 void handleLeftMouseClick(sf::Event::MouseButtonEvent event, Cell gameBoard[][3]) {
-    sf::Vector2f mousePosition(static_cast<float>(event.x), static_cast<float>(event.y));
+    // break out if a player has already won!
+    if (winningPlayer != State::Empty)
+        return;
 
     // find board indices & count how many x's and o's there are in the board currently
     int gridX = -1, gridY = -1;
@@ -66,35 +98,49 @@ void handleLeftMouseClick(sf::Event::MouseButtonEvent event, Cell gameBoard[][3]
             if (cell.state != State::Empty) numOfTurnsPassed++;
         }
     }
-
-    // break out if click is outside the playing area
+    
+    // there are three event cases:
+    // 1. the player clicked outside of the playing area
     if (gridX == -1 || gridY == -1) {
-        std::cout << "Click was outside the game boundary" << std::endl;
+        // do nothing
         return;
     }
 
-    // update the state
-    State currentPlayer = whosTurn(numOfTurnsPassed, gameBoard[gridX][gridY].state);
-    gameBoard[gridX][gridY].state = currentPlayer;
+    // 2. the player clicked a vacant cell
+    Cell &cell = gameBoard[gridX][gridY];
+    State currentTurn = whosTurn(numOfTurnsPassed);
 
-    // check for win
-    // there are 8 ways to win
-    // 2 diagonals
-    if ((gameBoard[0][0].state == gameBoard[1][1].state && gameBoard[1][1].state == gameBoard[2][2].state) ||
-        (gameBoard[2][0].state == gameBoard[1][1].state && gameBoard[1][1].state == gameBoard[0][2].state)) {
-        if (gameBoard[1][1].state != State::Empty) winningPlayer = currentPlayer; // empty states are also equivalent so they must be weeded out
+    if (cell.state == State::Empty) {
+        // set the state of the cell to be the correct state
+        std::cout << "cell is empty" << std::endl;
+        cell.state = currentTurn;
     }
-    // 3 horizontal and 3 vertical
-    for (int i = 0; i < 3; i++)
-        if ((gameBoard[i][0].state != State::Empty && gameBoard[i][0].state == gameBoard[i][1].state && gameBoard[i][1].state == gameBoard[i][2].state)
-            || (gameBoard[0][i].state != State::Empty && gameBoard[0][i].state == gameBoard[1][i].state && gameBoard[1][i].state == gameBoard[2][i].state)) {
-            winningPlayer = currentPlayer;
-        }
+
+    // 3. the player clicked an occupied cell
+    else {
+        // do nothing
+        std::cout << "Cell is occupied!" << std::endl;
+        return;
+    }
+
+    // there are two final cases
+    // check for win
+    std::cout << "Checking for win!" << std::endl;
+    checkForWin(gameBoard, currentTurn);
+    // check for draw
+    std::cout << "Checking for draw!" << std::endl;
+    if (numOfTurnsPassed >= 8) gameIsTied = true;
 }
 
+/// @brief This is the right mouse click event handler
+/// @param event the mouse button event information
+/// @param gameBoard the current gameboard
 void handleRightMouseClick(sf::Event::MouseButtonEvent event, Cell gameBoard[][3]){
+    // reset global variables
     winningPlayer = State::Empty;
+    gameIsTied = false;
 
+    // reset gameBoard
     for (int i = 0; i < 3; i++){
         for (int j = 0; j < 3; j++){
             gameBoard[i][j].state = State::Empty;
@@ -228,6 +274,31 @@ void gameUpdate(sf::RenderWindow& window, sf::RectangleShape displayBoard[], Cel
             window.draw(winCard);
             window.draw(winCardText);
             window.draw(winCardText2);
+        }
+
+        else if (gameIsTied){
+            // generate winCardText
+            sf::Font font;
+            font.loadFromFile(fontFile);
+
+            std::string s = "Game ended in a tie!!";
+            sf::String s2 = "Right click to play again...";
+
+            const uint textSize = 25;
+            sf::Text drawCardText(s, font, textSize);
+            sf::Text playAgainText(s2, font, textSize);
+            drawCardText.setColor(sf::Color::Red);
+            playAgainText.setColor(sf::Color::Red);
+            drawCardText.setPosition(200.f, 300.f);
+            playAgainText.setPosition(200.f, 330.f);
+
+            sf::RectangleShape drawCard(sf::Vector2f(500.f, 300.f));
+            drawCard.setFillColor(sf::Color::White);
+            drawCard.setPosition(150.f, 250.f);
+
+            window.draw(drawCard);
+            window.draw(playAgainText);
+            window.draw(drawCardText);
         }
         
         window.display();
